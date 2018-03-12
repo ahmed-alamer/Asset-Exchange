@@ -1,0 +1,6 @@
+.idea/
+AssetExchange.iml
+pkg/
+src/gopkg.in/
+src/golang.org/
+src/github.com/
