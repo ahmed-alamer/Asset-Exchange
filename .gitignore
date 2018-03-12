@@ -1,5 +1,5 @@
 .idea/
-AssetExchange.iml
+*.iml
 pkg/
 src/gopkg.in/
 src/golang.org/
