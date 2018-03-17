@@ -74,17 +74,23 @@ func (list *OrderList) Remove(order *Order) {
 	list.RemoveByOrderId(order.id)
 }
 
-func (list *OrderList) RemoveByOrderId(orderId int64) {
+func (list *OrderList) RemoveByOrderId(orderId int64) (removed bool, order *Order) {
 	backingListPointer := list.backingSlice[:0]
 	for _, existingOrder := range list.backingSlice {
 		if orderId == existingOrder.id {
 			list.size--
+			order = existingOrder
+			removed = true
+
 			continue
 		}
 
 		backingListPointer = append(backingListPointer, existingOrder)
 	}
+
 	list.backingSlice = backingListPointer
+
+	return removed, order
 }
 
 func (list *OrderList) Array() []*Order {

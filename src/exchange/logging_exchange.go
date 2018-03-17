@@ -12,6 +12,15 @@ type LoggingExchangeService struct {
 	logger *logrus.Logger
 }
 
+func (exchange LoggingExchangeService) CancelOrder(orderID int64, orderType orders.OrderType) (bool, *orders.Order) {
+	exchange.logger.WithFields(logrus.Fields{
+		"orderID": orderID,
+		"type":    orderType,
+	}).Info("Cancelling Order")
+
+	return exchange.impl.CancelOrder(orderID, orderType)
+}
+
 func NewLoggingExchange() *LoggingExchangeService {
 	logger := logrus.New()
 	logger.Out = os.Stdout

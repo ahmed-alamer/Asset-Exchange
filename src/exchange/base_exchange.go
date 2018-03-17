@@ -8,7 +8,6 @@ import (
 	"orders"
 )
 
-//TODO: refactor to by instrument
 type BaseExchangeService struct {
 	askBook          *orders.OrderList
 	bidBook          *orders.OrderList
@@ -36,6 +35,17 @@ func (exchange *BaseExchangeService) SubmitOrder(order *orders.Order) int64 {
 	return order.Id()
 }
 
+func (exchange *BaseExchangeService) CancelOrder(orderID int64, orderType orders.OrderType) (bool, *orders.Order) {
+	var targetBook *orders.OrderList
+	if orderType == orders.Ask {
+		targetBook = exchange.askBook
+	} else {
+		targetBook = exchange.bidBook
+	}
+
+	return targetBook.RemoveByOrderId(orderID)
+}
+
 func (exchange *BaseExchangeService) Execute() {
 	if exchange.askBook.IsEmpty() || exchange.bidBook.IsEmpty() {
 		return
@@ -58,15 +68,15 @@ func (exchange *BaseExchangeService) Execute() {
 		// ask larger than bid
 
 		log.Printf("Processing Bid Match: %s", bidOrder)
-		exchange.bidBook.RemoveByOrderId(bidOrder.Id()) // filled
+		exchange.bidBook.Pop() // filled
 
 		askOrder.AdjustVolume(math.Abs(remainingVolume))
 
 	} else {
 		// all cleared
 		log.Println("Processing full match")
-		exchange.bidBook.RemoveByOrderId(bidOrder.Id()) // filled
-		exchange.askBook.RemoveByOrderId(askOrder.Id()) // filled
+		exchange.bidBook.Pop() // filled
+		exchange.askBook.Pop() // filled
 	}
 
 	exchange.FillOrder(askOrder.Price(), math.Abs(remainingVolume), askOrder.AccountID(), bidOrder.AccountID())

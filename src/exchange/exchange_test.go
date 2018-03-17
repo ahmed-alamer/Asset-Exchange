@@ -55,3 +55,24 @@ func TestAskEqualsBidMatching(t *testing.T) {
 		t.Errorf("Incorrect fills!")
 	}
 }
+
+func TestCancelOrder(t *testing.T) {
+	exchange := NewLoggingExchange()
+
+	exchange.SubmitOrder(orders.NewOrder(1, 10, 10, orders.Ask))
+	order2ID := exchange.SubmitOrder(orders.NewOrder(1, 10, 10, orders.Ask))
+
+	cancelled, order := exchange.CancelOrder(order2ID, orders.Ask)
+
+	if !cancelled {
+		t.Errorf("Didn't cancel order!")
+	}
+
+	if order2ID != order.Id() {
+		t.Errorf("Didn't delete the correct order")
+	}
+
+	if exchange.AskDepth().Size() != 1 {
+		t.Errorf("Wrong ask book size!")
+	}
+}
