@@ -16,37 +16,40 @@ type BaseExchangeService struct {
 	orderIDGenerator int64
 }
 
+func (exchange *BaseExchangeService) SubmitAskOrder(order *orders.Order) int64 {
+	order.SetID(exchange.generateOrderID())
+	exchange.askBook.Add(order)
+
+	exchange.execute()
+
+	return order.Id()
+}
+
+func (exchange *BaseExchangeService) SubmitBidOrder(order *orders.Order) int64 {
+	order.SetID(exchange.generateOrderID())
+
+	exchange.bidBook.Add(order)
+
+	exchange.execute()
+
+	return order.Id()
+}
+
 func (exchange *BaseExchangeService) generateOrderID() int64 {
 	exchange.orderIDGenerator++
 
 	return exchange.orderIDGenerator
 }
 
-func (exchange *BaseExchangeService) SubmitOrder(order *orders.Order) int64 {
-	order.SetID(exchange.generateOrderID())
-	if order.OrderType() == orders.Ask {
-		exchange.askBook.Add(order)
-	} else {
-		exchange.bidBook.Add(order)
-	}
-
-	exchange.Execute()
-
-	return order.Id()
+func (exchange *BaseExchangeService) CancelAskOrder(orderID int64) (bool, *orders.Order) {
+	return exchange.askBook.RemoveByOrderId(orderID)
 }
 
-func (exchange *BaseExchangeService) CancelOrder(orderID int64, orderType orders.OrderType) (bool, *orders.Order) {
-	var targetBook *orders.OrderList
-	if orderType == orders.Ask {
-		targetBook = exchange.askBook
-	} else {
-		targetBook = exchange.bidBook
-	}
-
-	return targetBook.RemoveByOrderId(orderID)
+func (exchange *BaseExchangeService) CancelBidOrder(orderID int64) (bool, *orders.Order) {
+	return exchange.bidBook.RemoveByOrderId(orderID)
 }
 
-func (exchange *BaseExchangeService) Execute() {
+func (exchange *BaseExchangeService) execute() {
 	if exchange.askBook.IsEmpty() || exchange.bidBook.IsEmpty() {
 		return
 	}
@@ -79,10 +82,10 @@ func (exchange *BaseExchangeService) Execute() {
 		exchange.askBook.Pop() // filled
 	}
 
-	exchange.FillOrder(askOrder.Price(), math.Abs(remainingVolume), askOrder.AccountID(), bidOrder.AccountID())
+	exchange.fillOrder(askOrder.Price(), math.Abs(remainingVolume), askOrder.AccountID(), bidOrder.AccountID())
 }
 
-func (exchange *BaseExchangeService) FillOrder(price float64, volume float64, creditAccount int64, debitAccount int64) {
+func (exchange *BaseExchangeService) fillOrder(price float64, volume float64, creditAccount int64, debitAccount int64) {
 	fill := &Fill{
 		Price:         price,
 		Volume:        volume,
@@ -147,7 +150,7 @@ func (exchange *BaseExchangeService) Match() *orders.OrderList {
 
 			}
 
-			exchange.FillOrder(bidOrder.Price(), math.Abs(bidOrder.Volume()), askOrder.Id(), bidOrder.Id())
+			exchange.fillOrder(bidOrder.Price(), math.Abs(bidOrder.Volume()), askOrder.Id(), bidOrder.Id())
 		}
 
 	}

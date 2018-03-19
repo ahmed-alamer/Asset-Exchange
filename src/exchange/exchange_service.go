@@ -5,10 +5,13 @@ import (
 )
 
 type CoreExchangeService interface {
-	SubmitOrder(order *orders.Order) int64
-	CancelOrder(orderID int64, orderType orders.OrderType) (bool, *orders.Order)
-	FillOrder(price float64, volume float64, creditAccount int64, debitAccount int64)
+	SubmitAskOrder(order *orders.Order) int64
+	SubmitBidOrder(order *orders.Order) int64
+	CancelAskOrder(orderID int64) (bool, *orders.Order)
+	CancelBidOrder(orderID int64) (bool, *orders.Order)
 	AskDepth() *orders.OrderList
 	BidDepth() *orders.OrderList
 	Fills() []*Fill
+
+	fillOrder(price float64, volume float64, creditAccount int64, debitAccount int64)
 }

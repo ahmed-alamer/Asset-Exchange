@@ -9,8 +9,8 @@ import (
 func TestAskLessThanBidMatching(t *testing.T) {
 	orderBook := NewLoggingExchange()
 
-	orderBook.SubmitOrder(orders.NewOrder(1, 1.5, 10, orders.Ask))
-	orderBook.SubmitOrder(orders.NewOrder(2, 1.5, 50, orders.Bid))
+	orderBook.SubmitAskOrder(orders.NewOrder(1, 1.5, 10, orders.Limit))
+	orderBook.SubmitBidOrder(orders.NewOrder(2, 1.5, 50, orders.Limit))
 
 	fills := orderBook.Fills()
 
@@ -22,8 +22,8 @@ func TestAskLessThanBidMatching(t *testing.T) {
 func TestAskLargerThanBidMatching(t *testing.T) {
 	orderBook := NewLoggingExchange()
 
-	orderBook.SubmitOrder(orders.NewOrder(1, 1.5, 50, orders.Ask))
-	orderBook.SubmitOrder(orders.NewOrder(2, 1.5, 10, orders.Bid))
+	orderBook.SubmitAskOrder(orders.NewOrder(1, 1.5, 50, orders.Limit))
+	orderBook.SubmitBidOrder(orders.NewOrder(2, 1.5, 10, orders.Limit))
 
 	fills := orderBook.Fills()
 
@@ -46,8 +46,8 @@ func TestAskLargerThanBidMatching(t *testing.T) {
 func TestAskEqualsBidMatching(t *testing.T) {
 	orderBook := NewLoggingExchange()
 
-	orderBook.SubmitOrder(orders.NewOrder(1, 1.5, 10, orders.Ask))
-	orderBook.SubmitOrder(orders.NewOrder(2, 1.5, 10, orders.Bid))
+	orderBook.SubmitAskOrder(orders.NewOrder(1, 1.5, 10, orders.Limit))
+	orderBook.SubmitBidOrder(orders.NewOrder(2, 1.5, 10, orders.Limit))
 
 	fills := orderBook.Fills()
 
@@ -57,12 +57,12 @@ func TestAskEqualsBidMatching(t *testing.T) {
 }
 
 func TestCancelOrder(t *testing.T) {
-	exchange := NewLoggingExchange()
+	exchangeService := NewLoggingExchange()
 
-	exchange.SubmitOrder(orders.NewOrder(1, 10, 10, orders.Ask))
-	order2ID := exchange.SubmitOrder(orders.NewOrder(1, 10, 10, orders.Ask))
+	exchangeService.SubmitAskOrder(orders.NewOrder(1, 10, 10, orders.Limit))
+	order2ID := exchangeService.SubmitAskOrder(orders.NewOrder(1, 10, 10, orders.Limit))
 
-	cancelled, order := exchange.CancelOrder(order2ID, orders.Ask)
+	cancelled, order := exchangeService.CancelAskOrder(order2ID)
 
 	if !cancelled {
 		t.Errorf("Didn't cancel order!")
@@ -72,7 +72,7 @@ func TestCancelOrder(t *testing.T) {
 		t.Errorf("Didn't delete the correct order")
 	}
 
-	if exchange.AskDepth().Size() != 1 {
+	if exchangeService.AskDepth().Size() != 1 {
 		t.Errorf("Wrong ask book size!")
 	}
 }

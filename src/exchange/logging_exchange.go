@@ -12,13 +12,45 @@ type LoggingExchangeService struct {
 	logger *logrus.Logger
 }
 
-func (exchange LoggingExchangeService) CancelOrder(orderID int64, orderType orders.OrderType) (bool, *orders.Order) {
+func (exchange LoggingExchangeService) SubmitAskOrder(order *orders.Order) int64 {
+	orderID := exchange.impl.SubmitAskOrder(order)
 	exchange.logger.WithFields(logrus.Fields{
 		"orderID": orderID,
-		"type":    orderType,
-	}).Info("Cancelling Order")
+		"volume":  order.Volume(),
+		"price":   order.Price(),
+	}).Info("Submitted new ask order")
 
-	return exchange.impl.CancelOrder(orderID, orderType)
+	return orderID
+
+}
+
+func (exchange LoggingExchangeService) SubmitBidOrder(order *orders.Order) int64 {
+	orderID := exchange.impl.SubmitBidOrder(order)
+	exchange.logger.WithFields(logrus.Fields{
+		"orderID": orderID,
+		"volume":  order.Volume(),
+		"price":   order.Price(),
+	}).Info("Submitted new bid order")
+
+	return orderID
+}
+
+func (exchange LoggingExchangeService) CancelAskOrder(orderID int64) (bool, *orders.Order) {
+	exchange.logger.WithFields(logrus.Fields{
+		"orderID": orderID,
+	}).Info("Cancelling Ask Order")
+
+	return exchange.impl.CancelAskOrder(orderID)
+
+}
+
+func (exchange LoggingExchangeService) CancelBidOrder(orderID int64) (bool, *orders.Order) {
+	exchange.logger.WithFields(logrus.Fields{
+		"orderID": orderID,
+	}).Info("Cancelling Bid Order")
+
+	return exchange.impl.CancelBidOrder(orderID)
+
 }
 
 func NewLoggingExchange() *LoggingExchangeService {
@@ -30,19 +62,8 @@ func NewLoggingExchange() *LoggingExchangeService {
 	return &LoggingExchangeService{impl: NewExchange(), logger: logger}
 }
 
-func (exchange LoggingExchangeService) SubmitOrder(order *orders.Order) int64 {
-	orderID := exchange.impl.SubmitOrder(order)
-	exchange.logger.WithFields(logrus.Fields{
-		"orderID": orderID,
-		"volume":  order.Volume(),
-		"price":   order.Price(),
-	}).Info("Submitted new order")
-
-	return orderID
-}
-
-func (exchange LoggingExchangeService) FillOrder(price float64, volume float64, creditAccount int64, debitAccount int64) {
-	exchange.impl.FillOrder(price, volume, creditAccount, debitAccount)
+func (exchange LoggingExchangeService) fillOrder(price float64, volume float64, creditAccount int64, debitAccount int64) {
+	exchange.impl.fillOrder(price, volume, creditAccount, debitAccount)
 	exchange.logger.WithFields(logrus.Fields{
 		"price":  price,
 		"vol":    volume,

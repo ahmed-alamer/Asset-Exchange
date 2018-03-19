@@ -5,8 +5,8 @@ import "fmt"
 type OrderType int
 
 const (
-	Ask OrderType = iota
-	Bid
+	Limit  OrderType = iota
+	Market
 )
 
 type Order struct {
@@ -65,9 +65,5 @@ func (order Order) AccountID() int64 {
 }
 
 func orderTypeDisplayName(orderType OrderType) string {
-	if orderType == Ask {
-		return "Ask"
-	}
-
-	return "Bid"
+	return fmt.Sprint(orderType)
 }
