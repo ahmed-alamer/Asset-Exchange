@@ -1,9 +1,9 @@
 package exchange
 
 import (
+	"Asset-Exchange/orders"
 	"github.com/sirupsen/logrus"
 	"os"
-	"orders"
 )
 
 //TODO: Make this log text to the console and json to a file

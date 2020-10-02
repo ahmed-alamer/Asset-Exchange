@@ -1,7 +1,7 @@
 package exchange
 
 import (
-	"orders"
+	"Asset-Exchange/orders"
 )
 
 type CoreExchangeService interface {

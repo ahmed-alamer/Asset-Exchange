@@ -1,8 +1,8 @@
 package orders
 
 import (
-	"testing"
 	"log"
+	"testing"
 )
 
 func TestOrderList(t *testing.T) {

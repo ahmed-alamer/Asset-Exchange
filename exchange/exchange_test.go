@@ -1,9 +1,9 @@
 package exchange
 
 import (
-	"testing"
-	"orders"
+	"Asset-Exchange/orders"
 	"log"
+	"testing"
 )
 
 func TestAskLessThanBidMatching(t *testing.T) {
@@ -27,7 +27,7 @@ func TestAskLargerThanBidMatching(t *testing.T) {
 
 	fills := orderBook.Fills()
 
-	log.Printf(" Fills: %s", fills)
+	log.Printf(" Fills: %v", fills)
 
 	if len(fills) != 1 {
 		t.Errorf("Incorrect fills!")
