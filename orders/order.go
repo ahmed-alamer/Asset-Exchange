@@ -41,7 +41,7 @@ func (order *Order) SetID(id int64) {
 }
 
 func (order Order) String() string {
-	return fmt.Sprintf("Order: %s %d @ %f", orderTypeDisplayName(order.orderType), order.volume, order.price)
+	return fmt.Sprintf("Order: %s %f @ %f", orderTypeDisplayName(order.orderType), order.volume, order.price)
 }
 
 func (order Order) Type() OrderType {

@@ -1,11 +1,11 @@
 package exchange
 
 import (
-	"time"
+	"Asset-Exchange/accounting"
+	"Asset-Exchange/orders"
 	"log"
 	"math"
-	"accounting"
-	"orders"
+	"time"
 )
 
 type BaseExchangeService struct {
@@ -97,7 +97,7 @@ func (exchange *BaseExchangeService) FillOrder(price float64, volume float64, cr
 	exchange.ledger.AddEntry(credit)
 	exchange.ledger.AddEntry(debit)
 
-	log.Printf("WTF: %s", exchange.fills)
+	log.Printf("WTF: %v", exchange.fills)
 }
 
 func NewExchange() *BaseExchangeService {
